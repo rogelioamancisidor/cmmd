@@ -5,6 +5,7 @@ from mlp_dropout import GaussianMLP, BernoulliMLP, CLS
 from utils import kld_unit_mvn, shared_dataset,log_diag_mvn, floatX, loss_q_logp, nrmse, normalized_mse, compute_mmd, compute_kernel, mean_squared_error
 from optimizers import optimizer
 
+#
 e = 1e-8
 class CMMD(object):
     def __init__(self, x2dim,x1dim,args,ydim=2,enc_weights=None,dec_weights=None,dec2_weights=None,cls_weights=None):
