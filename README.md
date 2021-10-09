@@ -14,9 +14,9 @@ If you use this code in your research, please cite:
 	}
 
 ## Requirements
-The code for CMMD in the paper are developed in Theano. We suggest to run the code using `Docker`. Run the command `docker pull rogelioandrade/theano_setup:v4` to pull an image with all dependencies into your local machine or to run the code in a cluster, e.g. using `AKS`.
+The code for CMMD in the paper is developed in Theano. We suggest to run the code using `Docker`. Run the command `docker pull rogelioandrade/theano_setup:v4` to pull an image with all dependencies into your local machine or to run the code in a cluster.
 
-The structure of the project should look like this:
+Run `mkdir output data`, so the structure of the project look like this:
 
 ```
 cmmd 
@@ -24,34 +24,32 @@ cmmd
    │───output
    │───python
 ```
+
 Otherwise you will get error messages when loading the data, saving figures etc.
 
 **Note**: you can run `bash build_image` to build the above image and mount all folders inside `cmmd`.
 
 ## Downloads
 ### MNIST 2-modalities
-download data set link [data](https://biedu-my.sharepoint.com/:u:/g/personal/a1910329_nbsemp_no/EYkTm1w7pbVKieABiOHKHiIB5h8GmQGLZL5c_amRkWJGSw?e=jwsxGc)
+You can download the data set from here [data](https://biedu-my.sharepoint.com/:u:/g/personal/a1910329_nbsemp_no/EYkTm1w7pbVKieABiOHKHiIB5h8GmQGLZL5c_amRkWJGSw?e=jwsxGc), or you can get the matlab code to generate the two different modalities from here [code](https://www.google.com/url?q=https%3A%2F%2Fttic.uchicago.edu%2F~wwang5%2Fpapers%2Fdcca.tgz&sa=D&sntz=1&usg=AFQjCNF6TF3krK7GDKPX4o9bk3QbUaf5ZQ). The file is called `createMNIST.m`.
 
-Inside `data` there are two zip files containing the supervised (`supervised_lc_paper.pk.gz`) and unsupervised (`unsupervised_lc_paper.pk.gz`) data sets for Lending Club. 
+### XRBM 
+You can obtain the two files for the XRMB data set here [data1](https://biedu-my.sharepoint.com/:u:/g/personal/a1910329_nbsemp_no/EYkTm1w7pbVKieABiOHKHiIB5h8GmQGLZL5c_amRkWJGSw?e=a1N8KV) and [data2](https://biedu-my.sharepoint.com/:u:/g/personal/a1910329_nbsemp_no/EfBPGI6Ch0dGmuHBNBGcMIMBFJ2rmYI26okojFNQV9CaIA?e=Z8Ill8) or you can visit the website [link](https://home.ttic.edu/~klivescu/XRMB_data/full/README) 
+
+Make sure to save the data files inside `data` 
 
 ### Pretrained models 
-Pretrained models are available in the `output` folder. To load a pretrained model use the script `test_model1.py` or `test_model2.py`. 
+Pretrained models are available in the `output` folder. To load a pretrained model use the script `test_cmmd.py`. 
 
 **Note**: Weights trained on a GPU(CPU) can only be loaded again on a GPU(CPU). The pretrained weights in the `output` folder were trained on a GPU.
 
 ## Usage
 ### Training
 
-Make sure the [requirements](#requirements) are satisfied in your environment, and relevant [datasets](#downloads) are downloaded. `cd` into `python/model1` or `python/model2`, and run
+Make sure the [requirements](#requirements) are satisfied in your environment, and relevant [datasets](#downloads) are downloaded. `cd` into `python`, and run
 
-For model1 (on GPU)
 ```bash
 THEANO_FLAGS=device=cuda0,floatX=float32 python -u training_model1.py --outfile model1 --epochs 401 --n_cv 1 --beta 1.1 --dset paper --n_sup 1552 --n_unsup 30997 
-```
-
-For model2 (on GPU)
-```bash
-THEANO_FLAGS=device=cuda0,floatX=float32 python -u training_model2.py --outfile model2 --epochs 501 --n_cv 1 --beta 1.1 --dset paper --n_sup 1552 --n_unsup 30997 
 ```
 
 To run the code on cpu replace `device=cuda0` for `device=cpu`.
