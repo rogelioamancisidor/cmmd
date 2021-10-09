@@ -39,7 +39,10 @@ You can obtain the two files for the XRMB data set here [data1](https://biedu-my
 Make sure to save the data files inside `data` 
 
 ### Pretrained models 
-Pretrained models are available in the `output` folder. To load a pretrained model use the script `test_cmmd.py`. 
+To reproduce the results for CMMD and MNIST, dowloaded the pretranied model from here [pretrained_mnist](https://biedu-my.sharepoint.com/:f:/g/personal/a1910329_nbsemp_no/ElUBycfhLjhOlcdC4FnlbQEByUd1PAoQ6dVxjljSxKiqpQ?e=Fssl1v).
+
+Pretrained weights for XRBM can be found here [pretrained_xrmb](https://biedu-my.sharepoint.com/:f:/g/personal/a1910329_nbsemp_no/ElUBycfhLjhOlcdC4FnlbQEByUd1PAoQ6dVxjljSxKiqpQ?e=YDZ6b1)
+
 
 **Note**: Weights trained on a GPU(CPU) can only be loaded again on a GPU(CPU). The pretrained weights in the `output` folder were trained on a GPU.
 
