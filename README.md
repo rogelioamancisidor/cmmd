@@ -30,7 +30,8 @@ Otherwise you will get error messages when loading the data, saving figures etc.
 
 ## Downloads
 ### MNIST 2-modalities
-download data set link [data](https://biedu-my.sharepoint.com/:x:/g/personal/a1910329_nbsemp_no/EZzUs6AwQmBLil0JXjfUCEYBDvVX_fngMbwAckWjAKaCgg?e=Hga6YF)
+download data set link [data](https://biedu-my.sharepoint.com/:u:/g/personal/a1910329_nbsemp_no/EYkTm1w7pbVKieABiOHKHiIB5h8GmQGLZL5c_amRkWJGSw?e=jwsxGc)
+
 Inside `data` there are two zip files containing the supervised (`supervised_lc_paper.pk.gz`) and unsupervised (`unsupervised_lc_paper.pk.gz`) data sets for Lending Club. 
 
 ### Pretrained models 
