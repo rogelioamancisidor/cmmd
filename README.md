@@ -49,25 +49,15 @@ Pretrained models are available in the `output` folder. To load a pretrained mod
 Make sure the [requirements](#requirements) are satisfied in your environment, and relevant [datasets](#downloads) are downloaded. `cd` into `python`, and run
 
 ```bash
-THEANO_FLAGS=device=cuda0,floatX=float32 python -u training_model1.py --outfile model1 --epochs 401 --n_cv 1 --beta 1.1 --dset paper --n_sup 1552 --n_unsup 30997 
+THEANO_FLAGS=device=cuda0,floatX=float32 python -u ./train_cmmd.py --omega 0.4 --hdim_enc 2500 2500 2500 --hdim_dec 1024 1024 1024 --hdim_prior 1024 1024 1024 --zdim 50 --hdim_cls 70 70 --epochs 1001 --R 1 --outfile mnist --dset mnist
 ```
 
 To run the code on cpu replace `device=cuda0` for `device=cpu`.
 
 You can play with the hyperparameters using arguments, e.g.:
-- **`--n_sup`**: number of observations from the minority class, i.e. y=1
-- **`--n_unsup`** number of unsupervised  observations
+- **`--omega`**: omega parameter controling the mutual information optimization. 
+- **`--dropout_rate`** dropout probability
 - **`--zdim`**: dimension of latent variable
 
-For all arguments see all `add_argument()` functions in `training_model1.py` and `training_model2.py`
+For all arguments see all `add_argument()` functions in `train_cmmd.py`
 
-#### Stability
-<p align='center'><img src="output/auc_m1.png" width="50%" height="50%"></p>
-As mentioned in the paper, training M1 and M2 can be unstable. For example, the above diagram shows the test AUC during model training. In two of the runs, model training became unstable and it is reflected by a sharp and sundden drop in AUC.
-
-### Analyzing
-<p align='center'><img src="output/gmm_latent_space_m2.png"></p>
-
-Run `model.plot_gmm_space()` to draw `z` representations and visualize them as 2D t-sne vectors. The above figure shows a mixture of two Gaussians distributions in the latent space. The representations for customers with class label y=1 lie in the upper-right cuadrant. The histograms on the side show the estimated default probability for each class label. Customers with class label y=1 have on average higher default probabilities. The scatter color is given by its estimated default probability.      
-
-**Note**: It takes some epochs (~500 epochs) before the latent space shows a mixture model.
