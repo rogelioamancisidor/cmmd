@@ -38,15 +38,22 @@ You can obtain the two files for the XRMB data set here [data1](https://biedu-my
 
 Make sure to save the data files inside `data` 
 
+### Flickr
+You can obtaniened the data set here [data](http://www.cs.toronto.edu/~nitish/multimodal/index.html)
+
+### MNIST-SHVN
+See [link](https://github.com/iffsid/mmvae) for details about how to create the data set.
+
+
 ### Pretrained models 
-Reproduce the results in table 2.
+Reproduce the results in table 2 and 6.
 
 **MNIST**: Dowloaded the pretranied model from here [pretrained_mnist](https://biedu-my.sharepoint.com/:f:/g/personal/a1910329_nbsemp_no/EhqsIO9C2_hFrw2Hk2mD_aQBPFlahCG31bYAC6cWGQDqYw?e=rwnOVM), unzip the file and save it under `output`. Then run `test_cmmd.py` and choose `mnist` and `idx=0` as arguments for `test_cmmd`. 
 
 **XRMB**: Pretrained weights for XRMB can be obtained here [pretrained_xrmb](https://biedu-my.sharepoint.com/:f:/g/personal/a1910329_nbsemp_no/ElUBycfhLjhOlcdC4FnlbQEByUd1PAoQ6dVxjljSxKiqpQ?e=YDZ6b1). In this case, choose `xrbm` and `idx=0` as arguments for `test_cmmd`.
 
 
-**Note**: Weights trained on a GPU(CPU) can only be loaded again on a GPU(CPU). The pretrained weights in the `output` folder were trained on a GPU.
+**Note**: Weights trained on a GPU(CPU) can only be loaded again on a GPU(CPU). The pretrained weights in the above links  were trained on a GPU.
 
 ## Usage
 ### Training
