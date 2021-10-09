@@ -33,15 +33,17 @@ Otherwise you will get error messages when loading the data, saving figures etc.
 ### MNIST 2-modalities
 You can download the data set from here [data](https://biedu-my.sharepoint.com/:u:/g/personal/a1910329_nbsemp_no/EYkTm1w7pbVKieABiOHKHiIB5h8GmQGLZL5c_amRkWJGSw?e=jwsxGc), or you can get the matlab code to generate the two different modalities from here [code](https://www.google.com/url?q=https%3A%2F%2Fttic.uchicago.edu%2F~wwang5%2Fpapers%2Fdcca.tgz&sa=D&sntz=1&usg=AFQjCNF6TF3krK7GDKPX4o9bk3QbUaf5ZQ). The file is called `createMNIST.m`.
 
-### XRBM 
+### XRMB 
 You can obtain the two files for the XRMB data set here [data1](https://biedu-my.sharepoint.com/:u:/g/personal/a1910329_nbsemp_no/ET8dhlUmveRMgSkoi5cCAREBirLGU7PTPK_AX2f_r6Mp8w?e=vgc2jW) and [data2](https://biedu-my.sharepoint.com/:u:/g/personal/a1910329_nbsemp_no/EfBPGI6Ch0dGmuHBNBGcMIMBFJ2rmYI26okojFNQV9CaIA?e=Z8Ill8) or you can visit the website [link](https://home.ttic.edu/~klivescu/XRMB_data/full/README) 
 
 Make sure to save the data files inside `data` 
 
 ### Pretrained models 
-To reproduce the results in table 2, for  MNIST, dowloaded the pretranied model from here [pretrained_mnist](https://biedu-my.sharepoint.com/:f:/g/personal/a1910329_nbsemp_no/ElUBycfhLjhOlcdC4FnlbQEByUd1PAoQ6dVxjljSxKiqpQ?e=Fssl1v), unzip the file and save it under `output`. Then run `test_cmmd.py` and choose `mnist` and `idx=0` as arguments for `test_cmmd`. 
+Reproduce the results in table 2.
 
-Pretrained weights for XRBM can be found here [pretrained_xrmb](https://biedu-my.sharepoint.com/:f:/g/personal/a1910329_nbsemp_no/ElUBycfhLjhOlcdC4FnlbQEByUd1PAoQ6dVxjljSxKiqpQ?e=YDZ6b1). In this case, choose `xrbm` and `idx=0` as arguments for `test_cmmd`.
+**MNIST**: Dowloaded the pretranied model from here [pretrained_mnist](https://biedu-my.sharepoint.com/:f:/g/personal/a1910329_nbsemp_no/EhqsIO9C2_hFrw2Hk2mD_aQBPFlahCG31bYAC6cWGQDqYw?e=rwnOVM), unzip the file and save it under `output`. Then run `test_cmmd.py` and choose `mnist` and `idx=0` as arguments for `test_cmmd`. 
+
+**XRMB**: Pretrained weights for XRMB can be obtained here [pretrained_xrmb](https://biedu-my.sharepoint.com/:f:/g/personal/a1910329_nbsemp_no/ElUBycfhLjhOlcdC4FnlbQEByUd1PAoQ6dVxjljSxKiqpQ?e=YDZ6b1). In this case, choose `xrbm` and `idx=0` as arguments for `test_cmmd`.
 
 
 **Note**: Weights trained on a GPU(CPU) can only be loaded again on a GPU(CPU). The pretrained weights in the `output` folder were trained on a GPU.
