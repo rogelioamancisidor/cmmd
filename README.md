@@ -39,9 +39,9 @@ You can obtain the two files for the XRMB data set here [data1](https://biedu-my
 Make sure to save the data files inside `data` 
 
 ### Pretrained models 
-To reproduce the results for CMMD and MNIST, dowloaded the pretranied model from here [pretrained_mnist](https://biedu-my.sharepoint.com/:f:/g/personal/a1910329_nbsemp_no/ElUBycfhLjhOlcdC4FnlbQEByUd1PAoQ6dVxjljSxKiqpQ?e=Fssl1v).
+To reproduce the results in table 2, for  MNIST, dowloaded the pretranied model from here [pretrained_mnist](https://biedu-my.sharepoint.com/:f:/g/personal/a1910329_nbsemp_no/ElUBycfhLjhOlcdC4FnlbQEByUd1PAoQ6dVxjljSxKiqpQ?e=Fssl1v), unzip the file and save it under `output`. Then run `test_cmmd.py` and choose `mnist` and `idx=0` as arguments for `test_cmmd`. 
 
-Pretrained weights for XRBM can be found here [pretrained_xrmb](https://biedu-my.sharepoint.com/:f:/g/personal/a1910329_nbsemp_no/ElUBycfhLjhOlcdC4FnlbQEByUd1PAoQ6dVxjljSxKiqpQ?e=YDZ6b1)
+Pretrained weights for XRBM can be found here [pretrained_xrmb](https://biedu-my.sharepoint.com/:f:/g/personal/a1910329_nbsemp_no/ElUBycfhLjhOlcdC4FnlbQEByUd1PAoQ6dVxjljSxKiqpQ?e=YDZ6b1). In this case, choose `xrbm` and `idx=0` as arguments for `test_cmmd`.
 
 
 **Note**: Weights trained on a GPU(CPU) can only be loaded again on a GPU(CPU). The pretrained weights in the `output` folder were trained on a GPU.
