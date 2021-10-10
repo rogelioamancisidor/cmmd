@@ -9,67 +9,8 @@ from numba import prange
 import numba
 
 
-'''
-helper functions
-'''
-
 floatX = theano.config.floatX
 e = 1e-8
-
-@numba.njit(fastmath=True)
-def logdiagmvn(x, mu, var):
-    # expects batches
-    k = mu.shape[1]
-
-    logp = (-k / 2.0) * np.log(2 * np.pi) - 0.5 * np.sum(np.log(var), axis=1) - np.sum(0.5 * (1.0 / var) * (x - mu) * (x - mu), axis=1)
-    return logp
-
-@numba.njit(fastmath=True)
-def kl_divergence(q_mean, q_logvar, p_mean = 0, p_logvar = 0):
-    return 0.5 * (p_logvar - q_logvar + (np.exp(q_logvar) \
-                      + (q_mean - p_mean)**2) / np.exp(p_logvar) - 1)
-
-@numba.njit(fastmath=True)
-def logsumexp(X,N):
-    r = 0.0
-    for x in X:
-        r += np.exp(x) 
-    r = r/N    
-    return np.log(r)
-
-@numba.njit(fastmath=True,parallel=True)
-def marginal_kl(z,mu,var,zdim, S=1):
-    kl=[]
-    N = z.shape[0]
-    print("calculating the marginal KL numerically ...")
-    for s in range(S):
-        # iterate over z
-        for i in prange(N):
-            # broadcasting the ith observation to the same size 
-            # as parameters to evaluate it in all qs
-            z_s_x = np.zeros(z.shape)
-            for j in range(N):
-                z_s_x[j,:] = z[i,:]
-
-            # calculate q(z)
-            pdf_qz_x = logdiagmvn(z_s_x,mu, var)
-            logpdf_qz = logsumexp(pdf_qz_x,N)
-            
-            # now evaluate the prior
-            pdf_pz_s = logdiagmvn(z_s_x,np.zeros(z_s_x.shape),np.ones(z_s_x.shape))
-            logpdf_pz_s = logsumexp(pdf_pz_s,N)
-            
-            # KL, note that we drop the 1/N term using the logsumexp fucnt 
-            # since they will cancell anyways
-            kl_s = logpdf_qz - logpdf_pz_s
-
-            kl.append(kl_s)
-
-            if i%10000 == 0:
-                print(i)
-
-    return kl
-
 
 def str_to_bool(value):
     if isinstance(value, bool):
@@ -80,29 +21,10 @@ def str_to_bool(value):
         return True
     raise ValueError('not a valid boolean value in --balanced parameter')
 
-def nrmse(x_true, x_recon):
-    return T.mean(T.square(x_recon - x_true),axis=0)/(T.max(x_true,axis=0)-T.min(x_true,axis=0))
-
-
-def np_nrmse(x_true, x_recon):
-    return np.mean(np.square(x_recon - x_true),axis=0)/(np.max(x_true,axis=0)-np.min(x_true,axis=0))
-
-def normalized_mse(x_true, x_recon):
-    diff  = x_true - x_recon
-    nom   = T.sqrt(T.sum(T.square(T.abs_(diff)),axis=0))
-    denom = T.sqrt(T.sum(T.square(T.abs_(x_true)),axis=0))
-    return nom/denom
-
-def nmse(x_true, x_recon):
-    diff  = x_true - x_recon
-    nom   = np.sqrt(np.sum(np.square(np.abs(diff)),axis=0))
-    denom = np.sqrt(np.sum(np.square(np.abs(x_true)),axis=0))
-    return nom/denom
-
-def mse(x_true, x_recon):
+def rmse(x_true, x_recon):
     return np.sqrt(np.mean(np.square(x_recon - x_true)))
 
-def mean_squared_error(x_true, x_recon):
+def t_rmse(x_true, x_recon):
     return T.sqr(T.mean(T.square(x_recon - x_true)))
 
 def weights_to_gpu(np_weights,n_layers,distribution,components = 2):

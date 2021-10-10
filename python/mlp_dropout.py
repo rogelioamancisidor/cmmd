@@ -6,17 +6,21 @@ from sklearn.preprocessing import OneHotEncoder
 # the version below works on GPU 
 from theano.sandbox.rng_mrg import MRG_RandomStreams as RandomStreams
 from theano.tensor.extra_ops import to_one_hot
+from theano.ifelse import ifelse
 
 # XXX
 rng = np.random.RandomState()
 srng = RandomStreams()
 e = 1e-8
 
-def _dropout(layer, p=0):
-    # default p = 0 does not apply the dropout layer
-    mask = srng.binomial(n=1, p=1-p, size=layer.shape)
-    output = layer*T.cast(mask, theano.config.floatX)
-    
+def _dropout(layer, training_mode, p=0):
+    # training_mode = 1:
+    # applies dropout with retaining probablity 1-p
+    output = ifelse(T.eq(training_mode,1),
+        layer*T.cast(srng.binomial(n=1, p=1-p, size=layer.shape), theano.config.floatX)
+        ,
+        layer*T.cast((1-p),theano.config.floatX)
+        )
     return output
 
 
@@ -70,7 +74,7 @@ class HiddenLayer(object):
         self.params = [self.W, self.b]
 
 class HiddenDropoutLayer(HiddenLayer):
-    def __init__(self, input, n_in, n_out, activation, prefix, dropout_rate, W=None, b=None):
+    def __init__(self, input, n_in, n_out, activation, prefix, training_mode, dropout_rate, W=None, b=None):
         super(HiddenDropoutLayer, self).__init__(
                                                 input=input, 
                                                 n_in=n_in, 
@@ -80,13 +84,13 @@ class HiddenDropoutLayer(HiddenLayer):
                                                 prefix=prefix
                                                 )
 
-        self.output = _dropout(self.output, p=dropout_rate)
+        self.output = _dropout(self.output,training_mode, p=dropout_rate)
 
 class _MLP(object):
     # building block for MLP instantiations defined below
     # dropout_rate is a list of size 1 + nlayers, so the first elemnt in the list is applied to the input feature
     # and the other elements to each hidden layer
-    def __init__(self, x, n_in, n_hid, dropout_rate,nlayers=1, prefix='',activation = T.nnet.nnet.softplus,  Weights=None):
+    def __init__(self, x, n_in, n_hid,training_mode, dropout_rate,nlayers=1, prefix='',activation = T.nnet.nnet.softplus,  Weights=None):
         self.nlayers = nlayers
         self.hidden_layers = list()
         
@@ -114,6 +118,7 @@ class _MLP(object):
                     n_out=n_hid[k],
                     activation=activation,
                     prefix=prefix + ('_%d' % (k + 1)),
+                    training_mode=training_mode,
                     dropout_rate=p
                                     )
             else:
@@ -138,7 +143,7 @@ class _MLP(object):
 
 class GaussianMLPmu(_MLP):
     # Weight is a list with W's and b's to be pass into HiddenLayer, mu_layer and log_var_layer
-    def __init__(self, x, n_in, n_hid, n_out, var_fixed=1, dropout_rate=[0,0],nlayers=1, y=None, eps=None,Weights=None,activation=T.nnet.nnet.softplus): 
+    def __init__(self, x, n_in, n_hid, n_out, training_mode, var_fixed=1, dropout_rate=[0,0],nlayers=1, y=None, eps=None,Weights=None,activation=T.nnet.nnet.softplus): 
 
         if Weights is not None:
             # the pass_output flag controls whether to pass output layers weights
@@ -182,7 +187,7 @@ class GaussianMLPmu(_MLP):
 
             Weights = None
  
-        super(GaussianMLPmu, self).__init__(x, n_in, n_hid, dropout_rate=dropout_rate, nlayers=nlayers, prefix='GaussianMLP_hidden',Weights=Weights, activation=activation)
+        super(GaussianMLPmu, self).__init__(x, n_in, n_hid, training_mode, dropout_rate=dropout_rate, nlayers=nlayers, prefix='GaussianMLP_hidden',Weights=Weights, activation=activation)
         
         self.mu_layer = HiddenLayer(
             input=self.hidden_layers[-1].output,
@@ -207,13 +212,13 @@ class GaussianMLPmu(_MLP):
             # XXX specific to [0, 1] outputs
             #self.out = T.nnet.sigmoid(self.mu)
             self.sample = self.mu
-            var_batch = np.tile(var_fixed, (200,n_out)).astype(np.float32)
+            var_batch = np.tile(var_fixed, (200,n_out)).astype(np.float32) # hardcoding batchsize. FIX IT!
             self.cost = -log_diag_mvn(self.sample, var_batch)(y)
                 
 
 class CLS(_MLP):
     # Weight is a list with W's and b's to be pass into HiddenLayer, mu_layer and log_var_layer
-    def __init__(self, x, n_in, n_hid, n_out, dropout_rate=[0,0], nlayers=1, y=None, eps=None,Weights=None,activation=T.nnet.nnet.softplus): 
+    def __init__(self, x, n_in, n_hid, n_out, training_mode,dropout_rate=[0,0], nlayers=1, y=None, eps=None,Weights=None,activation=T.nnet.nnet.softplus): 
         if Weights is not None:
             # the pass_output flag controls whether to pass output layers weights
             # pass_output = True:  assigns weights to both hidden and output layers
@@ -237,7 +242,7 @@ class CLS(_MLP):
             b = None
 
             Weights = None
-        super(CLS, self).__init__(x, n_in, n_hid,dropout_rate=dropout_rate, nlayers=nlayers, prefix='GaussianMLP_hidden',Weights=Weights, activation=activation)
+        super(CLS, self).__init__(x, n_in, n_hid,training_mode,dropout_rate=dropout_rate, nlayers=nlayers, prefix='GaussianMLP_hidden',Weights=Weights, activation=activation)
         # for use as classifier
         self.cls_layer = HiddenLayer(
             input=self.hidden_layers[-1].output,
@@ -256,7 +261,7 @@ class CLS(_MLP):
 
 class GaussianMLP(_MLP):
     # Weight is a list with W's and b's to be pass into HiddenLayer, mu_layer and log_var_layer
-    def __init__(self, x, n_in, n_hid, n_out, dropout_rate=[0,0], nlayers=1, y=None, eps=None,Weights=None,activation=T.nnet.nnet.softplus): 
+    def __init__(self, x, n_in, n_hid, n_out, training_mode,dropout_rate=[0,0], nlayers=1, y=None, eps=None,Weights=None,activation=T.nnet.nnet.softplus): 
 
         if Weights is not None:
             # the pass_output flag controls whether to pass output layers weights
@@ -302,7 +307,7 @@ class GaussianMLP(_MLP):
 
             Weights = None
  
-        super(GaussianMLP, self).__init__(x, n_in, n_hid, dropout_rate=dropout_rate, nlayers=nlayers, prefix='GaussianMLP_hidden',Weights=Weights, activation=activation)
+        super(GaussianMLP, self).__init__(x, n_in, n_hid, training_mode,dropout_rate=dropout_rate, nlayers=nlayers, prefix='GaussianMLP_hidden',Weights=Weights, activation=activation)
         # for use as classifier
         if y == None and eps == None:
             self.cls_layer = HiddenLayer(
@@ -353,8 +358,6 @@ class GaussianMLP(_MLP):
             # for use as decoder
             if y:
                 assert(eps is None)
-                # XXX specific to [0, 1] outputs
-                #self.out = T.nnet.sigmoid(self.mu)
                 self.sample = self.mu
                 self.cost = -log_diag_mvn(self.sample, self.var)(y)
                 
@@ -362,7 +365,7 @@ class GaussianMLP(_MLP):
 
 class BernoulliMLP(_MLP):
     # Weight is a list with W's and b's to be pass into HiddenLayer and output layer
-    def __init__(self, x, n_in, n_hid, n_out,dropout_rate=[0,0], nlayers=1, y=None, Weights = None,activation=T.nnet.nnet.softplus):
+    def __init__(self, x, n_in, n_hid, n_out,training_mode,dropout_rate=[0,0], nlayers=1, y=None, Weights = None,activation=T.nnet.nnet.softplus):
 
         if Weights is not None:
             pass_output  = Weights[1]    
@@ -386,7 +389,7 @@ class BernoulliMLP(_MLP):
             b = None
             Weights = None
         
-        super(BernoulliMLP, self).__init__(x, n_in, n_hid, dropout_rate=dropout_rate,nlayers=nlayers, prefix='BernoulliMLP_hidden',Weights=Weights,activation=activation)
+        super(BernoulliMLP, self).__init__(x, n_in, n_hid,training_mode, dropout_rate=dropout_rate,nlayers=nlayers, prefix='BernoulliMLP_hidden',Weights=Weights,activation=activation)
         self.out_layer = HiddenLayer(
             W=W,
             b=b,
