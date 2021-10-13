@@ -1,8 +1,7 @@
 import os
 os.environ['KERAS_BACKEND'] = 'theano'
-from utils import weights_to_gpu,  rmse, kl_divergence, marginal_kl, floatX
+from utils import weights_to_gpu,  rmse, floatX
 from CMMD import CMMD
-#from CBMDv1 import CBMD as CMMD
 import argparse
 import numpy as np
 import json
@@ -45,7 +44,7 @@ def test_cmmd(folder_name,idx=0):
         y_dim = 40
         x1_dim = 273
         x2_dim = 112
-        print 'fold loaded', args.fold
+        print('fold {} loaded'.format(args.fold))
         x1, x2, y_tr, x1_te, x2_te, y_te, x1_cal, x2_cal, y_cal = load_folds_xrmb(idx=args.fold)
     
     # extract weights
@@ -63,7 +62,6 @@ def test_cmmd(folder_name,idx=0):
         print 'loading weights to gpu ...'
         enc_weights  = [weights_to_gpu(enc_weights,args.nlayers_enc,'Gaussian'), True]
         prior_weights = [weights_to_gpu(prior_weights,args.nlayers_prior,'Gaussian'),True]
-        #dec2_weights = [weights_to_gpu(prior_weights,args.nlayers_dec2,'Gaussian'),True]
         dec_weights  = [weights_to_gpu(dec_weights,args.nlayers_dec,'Gaussian'),True]
         cls_weights  = [weights_to_gpu(cls_weights,args.nlayers_cls,'Classifier'),True]
     elif args.dec_type == 'bernoulli':
@@ -87,17 +85,14 @@ def test_cmmd(folder_name,idx=0):
                 ,y_dim
                 ,enc_weights  = enc_weights
                 ,prior_weights = prior_weights
-                #,dec2_weights = dec2_weights
                 ,dec_weights  = dec_weights
                 ,cls_weights  = cls_weights
                 )
     
     if args.dset == 'mnist':
         label_hat = model.y_pred(x1_te, training_mode)
-        print('error rate {}'.format(sum(np.sum(y_te != label_hat,axis=1)!=0)/float(y_te.shape[0])))
-    elif args.dset == 'flickr':
-        print average_precision_score(y_te, model.draw_pi(x1_te, training_mode), average='samples')
-    elif args.dset in ('xrmb','xrmb_all'):
+        print('error rate {:.4f}'.format(sum(np.sum(y_te != label_hat,axis=1)!=0)/float(y_te.shape[0])))
+    elif args.dset in ('xrmb'):
         speaker_avg =[]
         speakers = [7,16,20,21,23,28,31,35]
         
@@ -139,7 +134,7 @@ def test_cmmd(folder_name,idx=0):
 
         eps  = np.random.randn(args.samples_z,x1_te.shape[0], args.zdim).astype(floatX)
         x2_hat = model.draw_x2(x1_te, training_mode)
-        print 'rmse x2:', rmse(x2_te,x2_hat)
+        print('rmse x2: {:.4}'.format(rmse(x2_te,x2_hat)))
 
 
 def main():
